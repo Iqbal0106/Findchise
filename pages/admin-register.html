@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar Admin - Findchisee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page-auth">
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">Findchisee</a>
+      <nav class="nav" aria-label="Menu utama">
+        <a href="admin-login.html">Login admin</a>
+        <a href="register.html">Daftar pengguna</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-shell">
+    <aside class="auth-panel">
+      <p class="eyebrow">Pendaftaran pengelola Findchisee</p>
+      <h1>Buat akun pengelola Findchisee.</h1>
+      <ul class="auth-list">
+        <li>Akun yang dibuat di sini langsung mendapat hak akses admin.</li>
+        <li>Email yang dipakai tetap bisa dipakai untuk masuk sebagai pengguna biasa.</li>
+        <li>Password disimpan sebagai hash dan diverifikasi di sisi server.</li>
+      </ul>
+      <p class="auth-note">
+        Halaman ini terpisah dari pendaftaran pengguna biasa. Hak admin baru aktif
+        setelah akun dibuat oleh <span class="mono">api/admin/register-admin.php</span>
+        dan diverifikasi lagi pada setiap permintaan oleh server.
+      </p>
+    </aside>
+
+    <section class="auth-form-wrap">
+      <div class="auth-card">
+        <h2>Daftar akun admin</h2>
+        <p class="auth-desc">
+          Halaman ini terpisah dari <a class="link" href="register.html">pendaftaran pengguna biasa</a>.
+          Sudah punya akun admin? <a class="link" href="admin-login.html">Masuk di sini</a>.
+        </p>
+
+        <p class="alert" id="pesan" hidden></p>
+
+        <form id="form-register-admin" novalidate>
+          <div class="field">
+            <label for="nama">Nama lengkap</label>
+            <input type="text" id="nama" name="nama" autocomplete="name" placeholder="Contoh: Andi Pratama">
+            <p class="field-error" id="nama-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="email">Email admin</label>
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="admin@email.com">
+            <p class="hint">Email ini juga bisa dipakai untuk masuk sebagai pengguna biasa.</p>
+            <p class="field-error" id="email-error" hidden></p>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" autocomplete="new-password" placeholder="Minimal 8 karakter">
+              <p class="hint">Minimal 8 karakter dengan kombinasi huruf dan angka.</p>
+              <p class="field-error" id="password-error" hidden></p>
+            </div>
+
+            <div class="field">
+              <label for="konfirmasi">Konfirmasi password</label>
+              <input type="password" id="konfirmasi" name="konfirmasi" autocomplete="new-password" placeholder="Ulangi password">
+              <p class="field-error" id="konfirmasi-error" hidden></p>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-solid btn-block" id="tombol-daftar-admin">Buat akun admin</button>
+        </form>
+
+        <p class="auth-foot">
+          Pendaftaran akun admin diproses di
+          <span class="mono">api/admin/register-admin.php</span>. Password di-hash dengan
+          <span class="mono">password_hash()</span> dan hak admin disimpan pada kolom
+          <span class="mono">is_admin</span>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="brand">Findchisee</p>
+      <p>Platform contoh untuk tugas kuliah E-Commerce dan Cloud System. Semua data brand di halaman ini fiktif.</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/admin-register.js"></script>
+</body>
+</html>

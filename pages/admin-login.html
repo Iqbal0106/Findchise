@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login Admin - Findchisee</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="page-auth">
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html">Findchisee</a>
+      <nav class="nav" aria-label="Menu utama">
+        <a href="index.html#franchise">Franchise</a>
+        <a href="login.html">Login pengguna</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth-shell">
+    <aside class="auth-panel">
+      <p class="eyebrow">Panel pengelola Findchisee</p>
+      <h1>Masuk sebagai admin.</h1>
+      <ul class="auth-list">
+        <li>Pantau statistik pengguna marketplace secara berkala.</li>
+        <li>Lihat daftar pendaftaran akun terbaru.</li>
+        <li>Kelola nama, email, dan password akun admin Anda.</li>
+      </ul>
+      <p class="auth-note">
+        Halaman ini hanya gerbang masuk. Hak admin baru aktif setelah sesi server
+        dibuat oleh <span class="mono">api/admin/login.php</span>, jadi mengetahui
+        alamat halaman ini tidak cukup untuk mendapat akses. Akun admin pertama
+        dibuat oleh pengelola lewat skrip terminal
+        <span class="mono">scripts/setup-admin.php</span> di server, bukan lewat
+        halaman web ini.
+      </p>
+    </aside>
+
+    <section class="auth-form-wrap">
+      <div class="auth-card">
+        <h2>Login admin</h2>
+        <p class="auth-desc">
+          Khusus akun dengan hak admin. Pemilik akun franchisee atau franchisor
+          tanpa hak admin tidak bisa masuk lewat halaman ini.
+        </p>
+        <p class="auth-desc">
+          Punya kode undangan? <a class="link" href="admin-register.html">Daftar akun admin di sini</a>.
+        </p>
+
+        <p class="alert" id="pesan" hidden></p>
+
+        <form id="form-login-admin" novalidate>
+          <div class="field">
+            <label for="email">Email admin</label>
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="admin@email.com">
+            <p class="field-error" id="email-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Password admin">
+            <p class="field-error" id="password-error" hidden></p>
+          </div>
+
+          <button type="submit" class="btn btn-solid btn-block" id="tombol-masuk-admin">Masuk sebagai admin</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="brand">Findchisee</p>
+      <p>Platform contoh untuk tugas kuliah E-Commerce dan Cloud System. Semua data brand di halaman ini fiktif.</p>
+    </div>
+  </footer>
+
+  <script src="../js/common.js"></script>
+  <script src="../js/admin-auth.js"></script>
+  <script src="../js/admin-login.js"></script>
+</body>
+</html>

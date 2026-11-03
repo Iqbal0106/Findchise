@@ -228,60 +228,6 @@ function keluar(arahkanKeLogin = true) {
   if (arahkanKeLogin) window.location.href = "login.html";
 }
 
-/* ---------- Bootstrap admin pertama ---------- */
-
-function adaAdmin() {
-  return bacaPengguna().some((u) => u.role === ROLE.ADMIN);
-}
-
-/* Membuat akun admin pertama. Hanya bisa dipakai bila belum ada admin sama sekali,
-   dan datanya diisi sendiri oleh pemakai (tidak ada kredensial tetap di kode). */
-async function buatAdminPertama({ nama, email, password }) {
-  if (!kriptoTersedia()) throw new Error(PESAN_KRIPTO_TIDAK_ADA);
-  if (adaAdmin()) throw new Error("Akun admin sudah tersedia. Silakan masuk sebagai admin.");
-  if (cariPenggunaEmail(email)) throw new Error("Email ini sudah terdaftar.");
-
-  const admin = {
-    id: buatIdPengguna(),
-    nama: String(nama).trim(),
-    email: normalisasiEmail(email),
-    password: await buatRekamPassword(password),
-    role: ROLE.ADMIN,
-    status: STATUS.AKTIF,
-    terdaftar: new Date().toISOString()
-  };
-
-  const daftar = bacaPengguna();
-  daftar.push(admin);
-  simpanPengguna(daftar);
-  return admin;
-}
-
-/* ---------- Manajemen user (admin) ---------- */
-
-function statistikPengguna() {
-  const daftar = bacaPengguna();
-  return {
-    total: daftar.length,
-    franchisee: daftar.filter((u) => u.role === ROLE.FRANCHISEE).length,
-    franchisor: daftar.filter((u) => u.role === ROLE.FRANCHISOR).length,
-    admin: daftar.filter((u) => u.role === ROLE.ADMIN).length,
-    aktif: daftar.filter((u) => u.status === STATUS.AKTIF).length,
-    pending: daftar.filter((u) => u.status === STATUS.PENDING).length,
-    nonaktif: daftar.filter((u) => u.status === STATUS.NONAKTIF).length
-  };
-}
-
-function ubahStatusPengguna(id, status) {
-  if (!Object.values(STATUS).includes(status)) throw new Error("Status tidak dikenal.");
-  const daftar = bacaPengguna();
-  const pengguna = daftar.find((u) => u.id === id);
-  if (!pengguna) throw new Error("Pengguna tidak ditemukan.");
-  pengguna.status = status;
-  simpanPengguna(daftar);
-  return pengguna;
-}
-
 /* ---------- Penjaga halaman ---------- */
 
 /* Panggil di awal halaman yang butuh login. Kembalikan user atau null (sambil mengalihkan). */

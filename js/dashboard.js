@@ -1,13 +1,13 @@
-/* Logika dashboard: tampilan berbeda untuk franchisee, franchisor, dan admin. */
+/* Logika dashboard pengguna: tampilan berbeda untuk franchisee dan franchisor.
+   Panel admin tidak lagi dibuat di sisi browser; halaman admin dilindungi
+   sesi PHP di server (pages/admin-*.php). */
 
-function kartuStatistik(label, nilai, catatan, idNilai) {
-  const id = idNilai ? ` id="${idNilai}"` : "";
-  const idCatatan = idNilai ? ` id="${idNilai}-catatan"` : "";
+function kartuStatistik(label, nilai, catatan) {
   return `
     <article class="stat-card">
       <p class="stat-label">${escapeHtml(label)}</p>
-      <p class="stat-nilai"${id}>${escapeHtml(nilai)}</p>
-      ${catatan ? `<p class="stat-catatan"${idCatatan}>${escapeHtml(catatan)}</p>` : ""}
+      <p class="stat-nilai">${escapeHtml(nilai)}</p>
+      ${catatan ? `<p class="stat-catatan">${escapeHtml(catatan)}</p>` : ""}
     </article>`;
 }
 
@@ -116,172 +116,27 @@ function renderFranchisor(pengguna) {
     </div>`;
 }
 
-/* ---------- Admin ---------- */
-
-const filterAdmin = { cari: "", status: "", role: "" };
-
-function penggunaTersaring() {
-  return bacaPengguna().filter((u) =>
-    (u.nama.toLowerCase().includes(filterAdmin.cari.toLowerCase()) ||
-      u.email.toLowerCase().includes(filterAdmin.cari.toLowerCase())) &&
-    (!filterAdmin.status || u.status === filterAdmin.status) &&
-    (!filterAdmin.role || u.role === filterAdmin.role)
-  );
-}
-
-function barisPengguna(u, adminSekarang) {
-  const diriSendiri = u.id === adminSekarang.id;
-  return `
-    <tr>
-      <td data-label="Nama">
-        <span class="nama-user">${escapeHtml(u.nama)}</span>
-        ${diriSendiri ? '<span class="badge">Anda</span>' : ""}
-      </td>
-      <td data-label="Email" class="mono">${escapeHtml(u.email)}</td>
-      <td data-label="Jenis akun">${escapeHtml(ROLE_LABEL[u.role] || u.role)}</td>
-      <td data-label="Status"><span class="pill pill-${u.status}">${escapeHtml(STATUS_LABEL[u.status] || u.status)}</span></td>
-      <td data-label="Terdaftar">${escapeHtml(formatTanggal(u.terdaftar))}</td>
-      <td data-label="Aksi">
-        <select class="select-status" data-id="${escapeHtml(u.id)}" ${diriSendiri ? "disabled" : ""}
-          aria-label="Ubah status ${escapeHtml(u.nama)}">
-          ${Object.keys(STATUS).map((kunci) => {
-            const nilai = STATUS[kunci];
-            return `<option value="${nilai}" ${u.status === nilai ? "selected" : ""}>${escapeHtml(STATUS_LABEL[nilai])}</option>`;
-          }).join("")}
-        </select>
-      </td>
-    </tr>`;
-}
-
-function renderTabelAdmin(adminSekarang) {
-  const daftar = penggunaTersaring();
-  const badan = document.getElementById("badan-tabel-user");
-  const kosong = document.getElementById("tabel-kosong");
-  if (!badan) return;
-
-  badan.innerHTML = daftar.map((u) => barisPengguna(u, adminSekarang)).join("");
-  kosong.hidden = daftar.length > 0;
-
-  const jumlah = document.getElementById("jumlah-user");
-  if (jumlah) jumlah.textContent = `${daftar.length} dari ${bacaPengguna().length} pengguna`;
-}
-
-function renderAdmin(pengguna) {
-  const stat = statistikPengguna();
-  document.getElementById("isi-dashboard").innerHTML = `
-    <div class="dash-grid">
-      ${kartuStatistik("Total pengguna", String(stat.total), "Seluruh akun terdaftar", "stat-total")}
-      ${kartuStatistik("Calon franchisee", String(stat.franchisee), "Pencari franchise", "stat-franchisee")}
-      ${kartuStatistik("Pemilik franchise", String(stat.franchisor), `${stat.pending} menunggu verifikasi`, "stat-franchisor")}
-      ${kartuStatistik("Admin", String(stat.admin), "Pengelola platform", "stat-admin")}
-
-      <section class="panel span-4">
-        <div class="panel-head">
-          <div>
-            <h2>Manajemen user</h2>
-            <p class="panel-desc">Kelola status akun dan telusuri pengguna Findchisee.</p>
-          </div>
-          <p class="result-count" id="jumlah-user"></p>
-        </div>
-
-        <div class="toolbar">
-          <div class="field field-wide">
-            <label for="cari-user">Cari pengguna</label>
-            <input type="search" id="cari-user" placeholder="Cari nama atau email">
-          </div>
-          <div class="field">
-            <label for="filter-status">Status akun</label>
-            <select id="filter-status">
-              <option value="">Semua status</option>
-              ${Object.keys(STATUS).map((kunci) =>
-                `<option value="${STATUS[kunci]}">${escapeHtml(STATUS_LABEL[STATUS[kunci]])}</option>`).join("")}
-            </select>
-          </div>
-          <div class="field">
-            <label for="filter-role">Jenis akun</label>
-            <select id="filter-role">
-              <option value="">Semua jenis</option>
-              ${Object.values(ROLE).map((nilai) =>
-                `<option value="${nilai}">${escapeHtml(ROLE_LABEL[nilai])}</option>`).join("")}
-            </select>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table class="tabel-user">
-            <thead>
-              <tr>
-                <th scope="col">Nama</th>
-                <th scope="col">Email</th>
-                <th scope="col">Jenis akun</th>
-                <th scope="col">Status</th>
-                <th scope="col">Terdaftar</th>
-                <th scope="col">Ubah status</th>
-              </tr>
-            </thead>
-            <tbody id="badan-tabel-user"></tbody>
-          </table>
-        </div>
-        <p class="empty" id="tabel-kosong" hidden>Tidak ada pengguna yang cocok dengan pencarian atau filter ini.</p>
-
-        <p class="hint">
-          Status akun hanya bisa diubah admin. Peran admin tidak dapat dibuat lewat form registrasi
-          dan tidak ada kredensial admin tetap di dalam kode.
-        </p>
-      </section>
-    </div>`;
-
-  renderTabelAdmin(pengguna);
-
-  document.getElementById("cari-user").addEventListener("input", (e) => {
-    filterAdmin.cari = e.target.value;
-    renderTabelAdmin(pengguna);
-  });
-  document.getElementById("filter-status").addEventListener("change", (e) => {
-    filterAdmin.status = e.target.value;
-    renderTabelAdmin(pengguna);
-  });
-  document.getElementById("filter-role").addEventListener("change", (e) => {
-    filterAdmin.role = e.target.value;
-    renderTabelAdmin(pengguna);
-  });
-
-  document.getElementById("badan-tabel-user").addEventListener("change", (e) => {
-    const pilihan = e.target.closest(".select-status");
-    if (!pilihan) return;
-    try {
-      ubahStatusPengguna(pilihan.dataset.id, pilihan.value);
-      renderTabelAdmin(pengguna);
-
-      const statBaru = statistikPengguna();
-      document.getElementById("stat-total").textContent = String(statBaru.total);
-      document.getElementById("stat-franchisee").textContent = String(statBaru.franchisee);
-      document.getElementById("stat-franchisor").textContent = String(statBaru.franchisor);
-      document.getElementById("stat-franchisor-catatan").textContent = `${statBaru.pending} menunggu verifikasi`;
-      document.getElementById("stat-admin").textContent = String(statBaru.admin);
-    } catch (kesalahan) {
-      window.alert(kesalahan.message);
-    }
-  });
-}
-
 /* ---------- Mulai ---------- */
 
 function mulaiDashboard() {
   const pengguna = wajibMasuk();
   if (!pengguna) return;
 
+  /* Admin tidak lagi memakai dashboard ini. Akun ber-role admin diarahkan ke
+     halaman admin yang hanya bisa dibuka setelah sesi PHP di server valid. */
+  if (pengguna.role === ROLE.ADMIN) {
+    window.location.replace("admin-login.html");
+    return;
+  }
+
   document.getElementById("label-peran").textContent = "Dashboard " + ROLE_LABEL[pengguna.role];
   document.getElementById("sapaan").textContent = "Halo, " + pengguna.nama;
   document.getElementById("sub-sapaan").textContent =
-    pengguna.role === ROLE.ADMIN
-      ? "Pantau pengguna dan status akun platform Findchisee."
-      : pengguna.role === ROLE.FRANCHISOR
-        ? "Pantau status verifikasi dan pengelolaan brand Anda."
-        : "Ringkasan akun Anda dan pintasan menuju katalog franchise.";
+    pengguna.role === ROLE.FRANCHISOR
+      ? "Pantau status verifikasi dan pengelolaan brand Anda."
+      : "Ringkasan akun Anda dan pintasan menuju katalog franchise.";
 
-  if (pengguna.role === ROLE.ADMIN) renderAdmin(pengguna);
-  else if (pengguna.role === ROLE.FRANCHISOR) renderFranchisor(pengguna);
+  if (pengguna.role === ROLE.FRANCHISOR) renderFranchisor(pengguna);
   else renderFranchisee(pengguna);
 }
 
